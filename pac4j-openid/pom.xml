@@ -3,9 +3,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.pac4j</groupId>
+        <groupId>com.appunity</groupId>
         <artifactId>pac4j</artifactId>
-        <version>1.9.2-SNAPSHOT</version>
+        <version>1.9.2</version>
     </parent>
 
     <artifactId>pac4j-openid</artifactId>
@@ -19,7 +19,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.pac4j</groupId>
+            <groupId>com.appunity</groupId>
             <artifactId>pac4j-core</artifactId>
         </dependency>
         <dependency>
@@ -49,7 +49,7 @@
         </dependency>
         <!-- for testing -->
         <dependency>
-            <groupId>org.pac4j</groupId>
+            <groupId>com.appunity</groupId>
             <artifactId>pac4j-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
