@@ -24,6 +24,8 @@ public abstract class BaseOAuth20Client<U extends OAuth20Profile> extends BaseOA
     protected static final Logger logger = LoggerFactory.getLogger(BaseOAuth20Client.class);
 
     public static final String OAUTH_CODE = "code";
+    public static final String OAUTH_ACCESS_TOKEN = "access_token";
+    public static final String OAUTH_TOKEN_RESPONSE = "token_response";
 
     @Override
     protected String retrieveAuthorizationUrl(final WebContext context) throws HttpAction {
@@ -36,10 +38,22 @@ public abstract class BaseOAuth20Client<U extends OAuth20Profile> extends BaseOA
     @Override
     protected OAuthCredentials getOAuthCredentials(final WebContext context) throws HttpAction {
         final String codeParameter = context.getRequestParameter(OAUTH_CODE);
+        final String accessTokenParameter = context.getRequestParameter(OAUTH_ACCESS_TOKEN);
+        final String rewResponseParameter = context.getRequestParameter(OAUTH_TOKEN_RESPONSE);
         if (codeParameter != null) {
             final String code = OAuthEncoder.decode(codeParameter);
             logger.debug("code: {}", code);
             return new OAuth20Credentials(code, getName());
+        } else if (accessTokenParameter != null || rewResponseParameter != null) {
+            OAuth2AccessToken accessToken;
+            if (rewResponseParameter != null) {
+                final String rewResponse = OAuthEncoder.decode(rewResponseParameter);
+                accessToken = this.service.getApi().getAccessTokenExtractor().extract(rewResponse);
+            } else {
+                final String accessTokenString = OAuthEncoder.decode(accessTokenParameter);
+                accessToken = new OAuth2AccessToken(accessTokenString);
+            }
+            return new OAuth20Credentials(accessToken, getName());
         } else {
             final String message = "No credential found";
             throw new OAuthCredentialsException(message);
@@ -49,10 +63,15 @@ public abstract class BaseOAuth20Client<U extends OAuth20Profile> extends BaseOA
     @Override
     protected OAuth2AccessToken getAccessToken(final OAuthCredentials credentials) throws HttpAction {
         OAuth20Credentials oAuth20Credentials = (OAuth20Credentials) credentials;
-        // no request token saved in context and no token (OAuth v2.0)
         final String code = oAuth20Credentials.getCode();
-        logger.debug("code: {}", code);
-        final OAuth2AccessToken accessToken = this.service.getAccessToken(code);
+        final OAuth2AccessToken accessToken;
+        if (code != null) {
+            logger.debug("code: {}", code);
+            accessToken = this.service.getAccessToken(code);
+        } else {
+            logger.debug("token already exists: {}", credentials);
+            accessToken = oAuth20Credentials.getAccessToken();
+        }
         logger.debug("accessToken: {}", accessToken);
         return accessToken;
     }

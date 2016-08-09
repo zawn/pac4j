@@ -1,5 +1,7 @@
 package org.pac4j.oauth.client;
 
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.utils.OAuthEncoder;
 import org.junit.Test;
 import org.pac4j.core.context.MockWebContext;
 import org.pac4j.core.exception.HttpAction;
@@ -48,6 +50,31 @@ public final class BaseOAuth20ClientTests implements TestsConstants {
                 .getCredentials(MockWebContext.create().addRequestParameter(BaseOAuth20Client.OAUTH_CODE, CODE));
         assertNotNull(oauthCredential);
         assertEquals(CODE, oauthCredential.getCode());
+    }
+
+    @Test
+    public void testTrustedToken() throws HttpAction {
+        MockWebContext mockWebContext = MockWebContext.create();
+        mockWebContext.addRequestParameter(BaseOAuth20Client.OAUTH_CODE, CODE);
+        final BaseOAuth20Client oAuth20Client = getClient();
+        OAuth20Credentials oauthCredential = (OAuth20Credentials) oAuth20Client
+                .getCredentials(mockWebContext);
+        assertNotNull(oauthCredential);
+        assertEquals(CODE, oauthCredential.getCode());
+        mockWebContext = MockWebContext.create();
+        mockWebContext.addRequestParameter(BaseOAuth20Client.OAUTH_ACCESS_TOKEN, "accessTokenString");
+        oauthCredential = (OAuth20Credentials) oAuth20Client.getCredentials(mockWebContext);
+        assertNotNull(oauthCredential);
+        assertEquals(new OAuth2AccessToken("accessTokenString"), oauthCredential.getAccessToken());
+        mockWebContext = MockWebContext.create();
+        final String plain = "access_token=9ad37e3246e6767d611da0287f98bb38c4c902ee&scope=user&token_type=bearer";
+        mockWebContext.addRequestParameter(BaseOAuth20Client.OAUTH_TOKEN_RESPONSE, OAuthEncoder.encode(plain));
+        oauthCredential = (OAuth20Credentials) oAuth20Client.getCredentials(mockWebContext);
+        assertNotNull(oauthCredential);
+        // OAuth2AccessToken{access_token=9ad37e3246e6767d611da0287f98bb38c4c902ee, token_type=bearer, expires_in=null, refresh_token=null, scope=user}
+        final OAuth2AccessToken accessToken = new OAuth2AccessToken("9ad37e3246e6767d611da0287f98bb38c4c902ee", "bearer", null, null, "user", plain);
+        assertEquals(accessToken, oauthCredential.getAccessToken());
+        assertEquals(accessToken, oAuth20Client.getAccessToken(oauthCredential));
     }
 
     @Test

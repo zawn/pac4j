@@ -1,5 +1,6 @@
 package org.pac4j.oauth.credentials;
 
+import com.github.scribejava.core.model.OAuth2AccessToken;
 import org.pac4j.core.util.CommonHelper;
 
 /**
@@ -11,6 +12,7 @@ import org.pac4j.core.util.CommonHelper;
 public class OAuth20Credentials extends OAuthCredentials {
 
     private String code;
+    private OAuth2AccessToken accessToken;
 
     /**
      * For OAuth2 Authorization Code Flow.
@@ -21,10 +23,27 @@ public class OAuth20Credentials extends OAuthCredentials {
     public OAuth20Credentials(String code, String clientName) {
         super(clientName);
         this.code = code;
+        this.accessToken = null;
+    }
+
+    /**
+     * For OAuth2 Trusted Access Token Flow.
+     *
+     * @param accessToken the accessToken.
+     * @param clientName  the client name.
+     */
+    public OAuth20Credentials(OAuth2AccessToken accessToken, String clientName) {
+        super(clientName);
+        this.code = null;
+        this.accessToken = accessToken;
     }
 
     public String getCode() {
         return code;
+    }
+
+    public OAuth2AccessToken getAccessToken() {
+        return accessToken;
     }
 
     @Override
@@ -34,19 +53,23 @@ public class OAuth20Credentials extends OAuthCredentials {
 
         OAuth20Credentials that = (OAuth20Credentials) o;
 
-        return code != null ? code.equals(that.code) : that.code == null;
+        if (code != null ? !code.equals(that.code) : that.code != null) return false;
+        return accessToken != null ? accessToken.equals(that.accessToken) : that.accessToken == null;
 
     }
 
     @Override
     public int hashCode() {
-        return code != null ? code.hashCode() : 0;
+        int result = code != null ? code.hashCode() : 0;
+        result = 31 * result + (accessToken != null ? accessToken.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return CommonHelper.toString(this.getClass(),
-                "code='", code,
+                "code", code,
+                "accessToken", accessToken,
                 "clientName", getClientName());
     }
 }
