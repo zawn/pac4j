@@ -1,12 +1,11 @@
 package org.pac4j.core.client;
 
 import org.pac4j.core.context.WebContext;
+import org.pac4j.core.credentials.Credentials;
+import org.pac4j.core.credentials.authenticator.Authenticator;
 import org.pac4j.core.credentials.extractor.CredentialsExtractor;
-import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
-import org.pac4j.core.credentials.authenticator.Authenticator;
-import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.profile.creator.AuthenticatorProfileCreator;
 import org.pac4j.core.profile.creator.ProfileCreator;
 import org.pac4j.core.util.CommonHelper;
@@ -35,17 +34,12 @@ public abstract class DirectClientV2<C extends Credentials, U extends CommonProf
     @Override
     protected C retrieveCredentials(final WebContext context) throws HttpAction {
         init(context);
-        try {
-            final C credentials = this.credentialsExtractor.extract(context);
-            if (credentials == null) {
-                return null;
-            }
-            this.authenticator.validate(credentials, context);
-            return credentials;
-        } catch (CredentialsException e) {
-            logger.error("Failed to retrieve or validate credentials", e);
+        final C credentials = this.credentialsExtractor.extract(context);
+        if (credentials == null) {
             return null;
         }
+        this.authenticator.validate(credentials, context);
+        return credentials;
     }
 
     @Override

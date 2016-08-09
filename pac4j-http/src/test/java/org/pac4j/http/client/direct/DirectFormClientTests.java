@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.pac4j.core.context.MockWebContext;
 import org.pac4j.core.context.Pac4jConstants;
 import org.pac4j.core.credentials.authenticator.LocalCachingAuthenticator;
+import org.pac4j.core.exception.CredentialsException;
 import org.pac4j.core.exception.HttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.ProfileHelper;
@@ -60,7 +61,7 @@ public final class DirectFormClientTests implements TestsConstants {
         assertNull(formClient.getCredentials(context.addRequestParameter(formClient.getPasswordParameter(), PASSWORD)));
     }
 
-    @Test
+    @Test(expected=CredentialsException.class)
     public void testGetBadCredentials() throws HttpAction {
         final DirectFormClient formClient = getFormClient();
         final MockWebContext context = MockWebContext.create();
