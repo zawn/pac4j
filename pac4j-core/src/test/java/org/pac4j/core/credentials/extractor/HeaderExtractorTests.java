@@ -43,6 +43,7 @@ public final class HeaderExtractorTests implements TestsConstants {
     public void testBadPrefix() {
         final MockWebContext context = MockWebContext.create().addRequestHeader(GOOD_HEADER, BAD_PREFIX + VALUE);
         TestsHelper.expectException(() -> extractor.extract(context), CredentialsException.class,
-            "Wrong prefix for header: " + GOOD_HEADER);
+            "Wrong prefix for header: \"" + GOOD_HEADER + ": " + BAD_PREFIX + VALUE
+                + "\",Expected matching RegExp : \"" + this.GOOD_HEADER + ": " + GOOD_PREFIX + ".*\"");
     }
 }
