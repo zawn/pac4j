@@ -66,7 +66,8 @@ public class HeaderExtractor implements CredentialsExtractor<TokenCredentials> {
         }
 
         if (!header.startsWith(this.prefixHeader)) {
-            throw new CredentialsException("Wrong prefix for header: " + this.headerName);
+            throw new CredentialsException("Wrong prefix for header: \"" + this.headerName + ": " + header
+                    + "\",Expected matching RegExp : \"" + this.headerName + ": " + this.prefixHeader + ".*\"");
         }
 
         String headerWithoutPrefix = header.substring(this.prefixHeader.length());
