@@ -1,7 +1,6 @@
 package org.pac4j.scribe.builder.api;
 
 import com.github.scribejava.core.builder.api.DefaultApi20;
-import com.github.scribejava.core.model.OAuthConfig;
 import com.github.scribejava.core.utils.OAuthEncoder;
 import java.util.Map;
 import org.pac4j.core.util.CommonHelper;
@@ -19,14 +18,17 @@ public class PayPalApi20 extends DefaultApi20 {
         + "&redirect_uri=%s&scope=%s&response_type=code&nonce=%s";
 
     @Override
-    public String getAuthorizationUrl(final OAuthConfig config, Map<String, String> additionalParams) {
-        CommonHelper.assertNotBlank("config.getCallback()", config.getCallback(),
+    public String getAuthorizationUrl(String responseType, String apiKey, String callback,
+                                      String scope, String state,
+                                      Map<String, String> additionalParams) {
+        CommonHelper.assertNotBlank("config.getCallback()", callback,
             "Must provide a valid url as callback. PayPal does not support OOB");
 
         final String nonce = System.currentTimeMillis() + CommonHelper.randomString(10);
-        return String.format(AUTHORIZATION_URL, config.getApiKey(), OAuthEncoder.encode(config.getCallback()),
-                             (config.getScope()!=null)?OAuthEncoder.encode(config.getScope()):"", nonce);
+        return String.format(AUTHORIZATION_URL, apiKey, OAuthEncoder.encode(callback),
+            (scope!=null)?OAuthEncoder.encode(scope):"", nonce);
     }
+
     @Override
     protected String getAuthorizationBaseUrl() {
         return "https://www.paypal.com/webapps/auth/protocol/openidconnect/v1/authorize";
