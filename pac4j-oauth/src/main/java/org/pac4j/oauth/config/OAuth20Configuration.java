@@ -18,6 +18,8 @@ import java.util.Map;
 public class OAuth20Configuration extends OAuthConfiguration<OAuth20Service, OAuth2AccessToken> {
 
     public static final String OAUTH_CODE = "code";
+    public static final String OAUTH_ACCESS_TOKEN = "access_token";
+    public static final String OAUTH_TOKEN_RESPONSE = "token_response";
 
     public static final String STATE_REQUEST_PARAMETER = "state";
 

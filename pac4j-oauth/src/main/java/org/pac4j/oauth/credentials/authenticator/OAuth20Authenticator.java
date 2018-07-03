@@ -1,15 +1,19 @@
 package org.pac4j.oauth.credentials.authenticator;
 
-import com.github.scribejava.core.model.OAuth2AccessToken;
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.HttpCommunicationException;
+import org.pac4j.core.exception.TechnicalException;
+import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.oauth.config.OAuth20Configuration;
 import org.pac4j.oauth.credentials.OAuth20Credentials;
 import org.pac4j.oauth.credentials.OAuthCredentials;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
+import com.github.scribejava.core.exceptions.OAuthException;
+import com.github.scribejava.core.model.OAuth2AccessToken;
 
 /**
  * OAuth 2.0 authenticator.
@@ -21,6 +25,22 @@ public class OAuth20Authenticator extends OAuthAuthenticator<OAuth20Credentials,
 
     public OAuth20Authenticator(final OAuth20Configuration configuration, final IndirectClient client) {
         super(configuration, client);
+    }
+
+    @Override
+    public void validate(OAuth20Credentials credentials, WebContext context) {
+        if (credentials.getAccessToken() != null) {
+            CommonProfile userProfile = client.getUserProfile(credentials, context);
+            if (userProfile == null) {
+                throw new HttpCommunicationException("Error token:" + credentials.getAccessToken());
+            }
+        } else {
+            try {
+                retrieveAccessToken(context, credentials);
+            } catch (final OAuthException e) {
+                throw new TechnicalException(e);
+            }
+        }
     }
 
     @Override
