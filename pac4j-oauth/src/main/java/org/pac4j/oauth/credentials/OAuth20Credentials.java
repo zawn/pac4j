@@ -25,6 +25,16 @@ public class OAuth20Credentials extends OAuthCredentials {
         this.code = code;
     }
 
+    /**
+     * For OAuth2 Other Flow.
+     *
+     * @param accessToken the accessToken.
+     */
+    public OAuth20Credentials(OAuth2AccessToken accessToken) {
+        this.code = null;
+        this.accessToken = accessToken;
+    }
+
     public String getCode() {
         return code;
     }
@@ -36,13 +46,15 @@ public class OAuth20Credentials extends OAuthCredentials {
 
         OAuth20Credentials that = (OAuth20Credentials) o;
 
-        return code != null ? code.equals(that.code) : that.code == null;
-
+        if (code != null ? !code.equals(that.code) : that.code != null) return false;
+        return accessToken != null ? accessToken.equals(that.accessToken) : that.accessToken == null;
     }
 
     @Override
     public int hashCode() {
-        return code != null ? code.hashCode() : 0;
+        int result = code != null ? code.hashCode() : 0;
+        result = 31 * result + (accessToken != null ? accessToken.hashCode() : 0);
+        return result;
     }
 
     public OAuth2AccessToken getAccessToken() {

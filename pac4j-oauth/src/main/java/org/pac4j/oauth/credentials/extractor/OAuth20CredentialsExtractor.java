@@ -1,5 +1,8 @@
 package org.pac4j.oauth.credentials.extractor;
 
+import com.github.scribejava.core.builder.api.DefaultApi20;
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.utils.OAuthEncoder;
 import org.pac4j.core.client.IndirectClient;
 import org.pac4j.core.context.WebContext;
@@ -7,6 +10,8 @@ import org.pac4j.core.util.CommonHelper;
 import org.pac4j.oauth.config.OAuth20Configuration;
 import org.pac4j.oauth.credentials.OAuth20Credentials;
 import org.pac4j.oauth.exception.OAuthCredentialsException;
+
+import java.io.IOException;
 
 /**
  * OAuth 2.0 credentials extractor.
@@ -44,10 +49,27 @@ public class OAuth20CredentialsExtractor extends OAuthCredentialsExtractor<OAuth
         }
 
         final String codeParameter = context.getRequestParameter(OAuth20Configuration.OAUTH_CODE);
+        final String accessTokenParameter = context.getRequestParameter(OAuth20Configuration.OAUTH_ACCESS_TOKEN);
+        final String rewResponseParameter = context.getRequestParameter(OAuth20Configuration.OAUTH_TOKEN_RESPONSE);
         if (codeParameter != null) {
             final String code = OAuthEncoder.decode(codeParameter);
             logger.debug("code: {}", code);
             return new OAuth20Credentials(code);
+        } else if (accessTokenParameter != null || rewResponseParameter != null) {
+            OAuth2AccessToken accessToken;
+            if (rewResponseParameter != null) {
+                final String rewResponse = OAuthEncoder.decode(rewResponseParameter);
+                Response response = new Response(200, "OK", null, rewResponse);
+                try {
+                    accessToken = ((DefaultApi20) this.configuration.getApi()).getAccessTokenExtractor().extract(response);
+                } catch (IOException e) {
+                    throw new OAuthCredentialsException("Extracted accessToken failed: please check the submitted request format is correct");
+                }
+            } else {
+                final String accessTokenString = OAuthEncoder.decode(accessTokenParameter);
+                accessToken = new OAuth2AccessToken(accessTokenString);
+            }
+            return new OAuth20Credentials(accessToken);
         } else {
             final String message = "No credential found";
             throw new OAuthCredentialsException(message);

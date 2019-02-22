@@ -1,6 +1,8 @@
 package org.pac4j.oauth.client;
 
 import org.pac4j.core.client.IndirectClient;
+import org.pac4j.core.context.WebContext;
+import org.pac4j.core.exception.BadCredentialsException;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.oauth.config.OAuth20Configuration;
 import org.pac4j.oauth.credentials.OAuth20Credentials;
@@ -51,6 +53,20 @@ public class OAuth20Client<U extends OAuth20Profile> extends IndirectClient<OAut
     public void setSecret(final String secret) {
         configuration.setSecret(secret);
     }
+
+    public boolean isAllowExistingToken(OAuth20Credentials credentials, WebContext context) {
+        if (!configuration.getAllowExistingToken()) {
+            return false;
+        }
+        try {
+            getUserProfile(credentials, context);
+            return true;
+        } catch (Exception e) {
+            throw new BadCredentialsException("AccessToken is invalid");
+        }
+    }
+
+    public void setAllowExistingToken(boolean allowToken) { configuration.setAllowExistingToken(allowToken); }
 
     @Override
     public String toString() {

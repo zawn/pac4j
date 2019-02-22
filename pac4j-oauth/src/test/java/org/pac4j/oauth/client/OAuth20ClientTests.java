@@ -1,11 +1,16 @@
 package org.pac4j.oauth.client;
 
+import com.github.scribejava.core.model.OAuth2AccessToken;
+import com.github.scribejava.core.utils.OAuthEncoder;
 import org.junit.Test;
 import org.pac4j.core.context.MockWebContext;
+import org.pac4j.core.context.WebContext;
 import org.pac4j.core.exception.TechnicalException;
 import org.pac4j.core.util.CommonHelper;
 import org.pac4j.core.util.TestsConstants;
 import org.pac4j.core.util.TestsHelper;
+import org.pac4j.oauth.config.OAuth20Configuration;
+import org.pac4j.oauth.credentials.OAuth20Credentials;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -173,5 +178,68 @@ public final class OAuth20ClientTests implements TestsConstants {
         client.setCallbackUrl(CALLBACK_URL);
         client.setScope(null);
         TestsHelper.initShouldFail(client, "scope cannot be blank");
+    }
+
+    private OAuth20Client getTokenClient(boolean allowToken) {
+        final GitHubClient client = new GitHubClient() {
+            @Override
+            public boolean isAllowExistingToken(OAuth20Credentials credentials, WebContext context) {
+                return configuration.getAllowExistingToken();
+            }
+        };
+        client.setAllowExistingToken(allowToken);
+        client.setKey(KEY);
+        client.setSecret(SECRET);
+        client.setCallbackUrl(CALLBACK_URL);
+        return client;
+    }
+
+    @Test
+    public void testNotAllowTokenDefault() {
+        MockWebContext mockWebContext = MockWebContext.create();
+        final OAuth20Client oAuth20Client = getClient();
+        mockWebContext.addRequestParameter(OAuth20Configuration.OAUTH_ACCESS_TOKEN,
+            "accessTokenString");
+        OAuth20Credentials oauthCredential = (OAuth20Credentials) oAuth20Client.getCredentials(mockWebContext);
+        assertNull(oauthCredential);
+    }
+
+    @Test
+    public void testNotAllowToken() {
+        MockWebContext mockWebContext = MockWebContext.create();
+        final OAuth20Client oAuth20Client = getTokenClient(false);
+        mockWebContext.addRequestParameter(OAuth20Configuration.OAUTH_ACCESS_TOKEN,
+            "accessTokenString");
+        OAuth20Credentials oauthCredential = (OAuth20Credentials) oAuth20Client.getCredentials(mockWebContext);
+        assertNull(oauthCredential);
+    }
+
+    @Test
+    public void testAccessToken() {
+        MockWebContext mockWebContext = MockWebContext.create();
+        final OAuth20Client oAuth20Client = getTokenClient(true);
+        mockWebContext.addRequestParameter(OAuth20Configuration.OAUTH_ACCESS_TOKEN,
+            "accessTokenString");
+        OAuth20Credentials oauthCredential = (OAuth20Credentials) oAuth20Client.getCredentials(mockWebContext);
+        assertNotNull(oauthCredential);
+        assertEquals(new OAuth2AccessToken("accessTokenString"), oauthCredential.getAccessToken());
+    }
+
+
+
+    @Test
+    public void testTokenResponse() {
+        MockWebContext mockWebContext = MockWebContext.create();
+        final OAuth20Client oAuth20Client = getTokenClient(true);
+        final String plain = "access_token=9ad37e3246e6767d611da0287f98bb38c4c902ee&scope=user&token_type=bearer";
+        mockWebContext.addRequestParameter(OAuth20Configuration.OAUTH_TOKEN_RESPONSE,
+            OAuthEncoder.encode(plain));
+        OAuth20Credentials oauthCredential = (OAuth20Credentials) oAuth20Client.getCredentials(
+            mockWebContext);
+        assertNotNull(oauthCredential);
+        // OAuth2AccessToken{access_token=9ad37e3246e6767d611da0287f98bb38c4c902ee, token_type=bearer, expires_in=null, refresh_token=null, scope=user}
+        final OAuth2AccessToken accessToken = new OAuth2AccessToken(
+            "9ad37e3246e6767d611da0287f98bb38c4c902ee", "bearer", null, null, "user", plain);
+        assertEquals(accessToken, oauthCredential.getAccessToken());
     }
 }

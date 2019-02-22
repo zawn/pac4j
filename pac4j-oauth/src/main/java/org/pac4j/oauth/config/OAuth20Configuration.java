@@ -18,6 +18,8 @@ import java.util.Map;
 public class OAuth20Configuration extends OAuthConfiguration<OAuth20Service, OAuth2AccessToken> {
 
     public static final String OAUTH_CODE = "code";
+    public static final String OAUTH_ACCESS_TOKEN = "access_token";
+    public static final String OAUTH_TOKEN_RESPONSE = "token_response";
 
     public static final String STATE_REQUEST_PARAMETER = "state";
 
@@ -25,6 +27,8 @@ public class OAuth20Configuration extends OAuthConfiguration<OAuth20Service, OAu
 
     /* Map containing user defined parameters */
     private Map<String, String> customParams = new HashMap<>();
+
+    private boolean allowExistingToken;
 
     private boolean withState;
 
@@ -46,6 +50,14 @@ public class OAuth20Configuration extends OAuthConfiguration<OAuth20Service, OAu
 
     public void setCustomParams(final Map<String, String> customParams) {
         this.customParams = customParams;
+    }
+
+    public boolean getAllowExistingToken() {
+        return allowExistingToken;
+    }
+
+    public void setAllowExistingToken(boolean allowToken) {
+        this.allowExistingToken = allowToken;
     }
 
     public boolean isWithState() {
