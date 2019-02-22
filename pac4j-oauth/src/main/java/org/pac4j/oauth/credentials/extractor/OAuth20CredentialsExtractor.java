@@ -50,7 +50,8 @@ public class OAuth20CredentialsExtractor extends OAuthCredentialsExtractor<OAuth
 
         final String codeParameter = context.getRequestParameter(OAuth20Configuration.OAUTH_CODE);
         final String accessTokenParameter = context.getRequestParameter(OAuth20Configuration.OAUTH_ACCESS_TOKEN);
-        final String rewResponseParameter = context.getRequestParameter(OAuth20Configuration.OAUTH_TOKEN_RESPONSE);
+        final String rewResponseParameter = context.getRequestParameter(
+            OAuth20Configuration.OAUTH_TOKEN_RESPONSE);
         if (codeParameter != null) {
             final String code = OAuthEncoder.decode(codeParameter);
             logger.debug("code: {}", code);
@@ -63,7 +64,8 @@ public class OAuth20CredentialsExtractor extends OAuthCredentialsExtractor<OAuth
                 try {
                     accessToken = ((DefaultApi20) this.configuration.getApi()).getAccessTokenExtractor().extract(response);
                 } catch (IOException e) {
-                    throw new OAuthCredentialsException("Extracted accessToken failed: please check the submitted request format is correct");
+                    throw new OAuthCredentialsException(
+                        "Extracted accessToken failed: please check the submitted request format is correct");
                 }
             } else {
                 final String accessTokenString = OAuthEncoder.decode(accessTokenParameter);

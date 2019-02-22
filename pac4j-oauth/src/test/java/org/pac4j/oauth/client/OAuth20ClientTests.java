@@ -237,9 +237,11 @@ public final class OAuth20ClientTests implements TestsConstants {
         OAuth20Credentials oauthCredential = (OAuth20Credentials) oAuth20Client.getCredentials(
             mockWebContext);
         assertNotNull(oauthCredential);
-        // OAuth2AccessToken{access_token=9ad37e3246e6767d611da0287f98bb38c4c902ee, token_type=bearer, expires_in=null, refresh_token=null, scope=user}
+        // OAuth2AccessToken{access_token=9ad37e3246e6767d611da0287f98bb38c4c902ee,
+        // token_type=bearer, expires_in=null, refresh_token=null, scope=user}
         final OAuth2AccessToken accessToken = new OAuth2AccessToken(
-            "9ad37e3246e6767d611da0287f98bb38c4c902ee", "bearer", null, null, "user", plain);
+            "9ad37e3246e6767d611da0287f98bb38c4c902ee",
+            "bearer", null, null, "user", plain);
         assertEquals(accessToken, oauthCredential.getAccessToken());
     }
 }
