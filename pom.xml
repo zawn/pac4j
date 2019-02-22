@@ -8,11 +8,11 @@
 		<version>9</version>
 	</parent>
 
-	<groupId>org.pac4j</groupId>
+	<groupId>com.appunity</groupId>
 	<artifactId>pac4j</artifactId>
 	<packaging>pom</packaging>
 	<name>pac4j</name>
-	<version>3.6.2-SNAPSHOT</version>
+	<version>3.6.1</version>
 	<description>Profile &amp; Authentication Client for Java</description>
 	<url>https://github.com/pac4j/pac4j</url>
 
@@ -39,21 +39,21 @@
 	</developers>
 
 	<modules>
-		<module>pac4j-core</module>
-		<module>pac4j-config</module>
+		<!--<module>pac4j-core</module>-->
+		<!--<module>pac4j-config</module>-->
 		<module>pac4j-oauth</module>
-		<module>pac4j-cas</module>
-		<module>pac4j-openid</module>
-		<module>pac4j-http</module>
-		<module>pac4j-saml</module>
-		<module>pac4j-gae</module>
-		<module>pac4j-oidc</module>
-		<module>pac4j-jwt</module>
-		<module>pac4j-ldap</module>
-		<module>pac4j-sql</module>
-		<module>pac4j-mongo</module>
-		<module>pac4j-couch</module>
-		<module>pac4j-kerberos</module>
+		<!--<module>pac4j-cas</module>-->
+		<!--<module>pac4j-openid</module>-->
+		<!--<module>pac4j-http</module>-->
+		<!--<module>pac4j-saml</module>-->
+		<!--<module>pac4j-gae</module>-->
+		<!--<module>pac4j-oidc</module>-->
+		<!--<module>pac4j-jwt</module>-->
+		<!--<module>pac4j-ldap</module>-->
+		<!--<module>pac4j-sql</module>-->
+		<!--<module>pac4j-mongo</module>-->
+		<!--<module>pac4j-couch</module>-->
+		<!--<module>pac4j-kerberos</module>-->
 	</modules>
 
 	<properties>
@@ -273,7 +273,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.20.1</version>
+				<version>2.22.1</version>
 				<configuration>
 					<includes>
 						<include>**/*Tests.java</include>
@@ -548,5 +548,13 @@
 			</build>
 		</profile>
 	</profiles>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <name>zhangzhenli-pac4j</name>
+            <url>https://api.bintray.com/maven/zhangzhenli/maven/PAC4J/;publish=1</url>
+        </repository>
+    </distributionManagement>
 
 </project>
